@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11) 
+cmake_minimum_required(VERSION 3.11)
 include(FetchContent)
 
 # We use a function to enforce a scoped variables creation only for FastDDS build (i.e turn off BUILD_SHARED_LIBS which is used on LRS build as well)
@@ -10,7 +10,14 @@ function(get_foonathan_memory)
     mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
     mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
 
-    message(CHECK_START  "Fetching foonathan_memory...")
+    # Check if the source directory already exists, if so, disable downloading
+    if(EXISTS "${CMAKE_BINARY_DIR}/third-party/foonathan_memory")
+        set(FETCHCONTENT_FULLY_DISCONNECTED ON)
+        message(STATUS "foonathan_memory source directory exists, using existing source at ${CMAKE_BINARY_DIR}/third-party/foonathan_memory")
+    else()
+        message(CHECK_START  "Fetching foonathan_memory...")
+    endif()
+
     list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
     FetchContent_Declare(

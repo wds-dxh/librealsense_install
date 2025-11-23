@@ -7,28 +7,34 @@ include(ExternalProject)
 # (i.e turn off BUILD_SHARED_LIBS which is used on LRS build as well)
 function(get_pybind11)
 
-    message( STATUS #CHECK_START
-        "Fetching pybind11..." )
-    #list( APPEND CMAKE_MESSAGE_INDENT "  " )  # Indent outputs
+    # Check if the directory already exists before attempting download
+    if(EXISTS "${CMAKE_BINARY_DIR}/third-party/pybind11")
+        message( STATUS #CHECK_PASS
+            "pybind11 already exists, using existing source at ${CMAKE_BINARY_DIR}/third-party/pybind11" )
+    else()
+        message( STATUS #CHECK_START
+            "Fetching pybind11..." )
+        #list( APPEND CMAKE_MESSAGE_INDENT "  " )  # Indent outputs
 
-    # We want to clone the pybind repo and build it here, during configuration, so we can use it.
-    # But ExternalProject_add is limited in that it only does its magic during build.
-    # This is possible in CMake 3.12+ with FetchContent and FetchContent_MakeAvailable in 3.14+ (meaning Ubuntu 20)
-    # but we need to adhere to CMake 3.10 (Ubuntu 18).
-    # So instead, we invoke a new CMake project just to download pybind:
-    configure_file( CMake/pybind11-download.cmake.in
-                    ${CMAKE_BINARY_DIR}/external-projects/pybind11-download/CMakeLists.txt )
-    execute_process( COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-download"
-                     OUTPUT_QUIET
-                     RESULT_VARIABLE configure_ret )
-    execute_process( COMMAND "${CMAKE_COMMAND}" --build .
-                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-download"
-                     OUTPUT_QUIET
-                     RESULT_VARIABLE build_ret )
+        # We want to clone the pybind repo and build it here, during configuration, so we can use it.
+        # But ExternalProject_add is limited in that it only does its magic during build.
+        # This is possible in CMake 3.12+ with FetchContent and FetchContent_MakeAvailable in 3.14+ (meaning Ubuntu 20)
+        # but we need to adhere to CMake 3.10 (Ubuntu 18).
+        # So instead, we invoke a new CMake project just to download pybind:
+        configure_file( CMake/pybind11-download.cmake.in
+                        ${CMAKE_BINARY_DIR}/external-projects/pybind11-download/CMakeLists.txt )
+        execute_process( COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+                         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-download"
+                         OUTPUT_QUIET
+                         RESULT_VARIABLE configure_ret )
+        execute_process( COMMAND "${CMAKE_COMMAND}" --build .
+                         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-download"
+                         OUTPUT_QUIET
+                         RESULT_VARIABLE build_ret )
 
-    if( configure_ret OR build_ret )
-        message( FATAL_ERROR "Failed to download pybind11" )
+        if( configure_ret OR build_ret )
+            message( FATAL_ERROR "Failed to download pybind11" )
+        endif()
     endif()
 
     # Now that it's available, we can refer to it with an actual ExternalProject_add (but notice we're not
@@ -85,28 +91,34 @@ endfunction()
 # We also want a json-compatible pybind interface:
 function(get_pybind11_json)
 
-    message( STATUS #CHECK_START
-        "Fetching pybind11_json..." )
-    #list( APPEND CMAKE_MESSAGE_INDENT "  " )  # Indent outputs
+    # Check if the directory already exists before attempting download
+    if(EXISTS "${CMAKE_BINARY_DIR}/third-party/pybind11-json")
+        message( STATUS #CHECK_PASS
+            "pybind11_json already exists, using existing source at ${CMAKE_BINARY_DIR}/third-party/pybind11-json" )
+    else()
+        message( STATUS #CHECK_START
+            "Fetching pybind11_json..." )
+        #list( APPEND CMAKE_MESSAGE_INDENT "  " )  # Indent outputs
 
-    # We want to clone the pybind repo and build it here, during configuration, so we can use it.
-    # But ExternalProject_add is limited in that it only does its magic during build.
-    # This is possible in CMake 3.12+ with FetchContent and FetchContent_MakeAvailable in 3.14+ (meaning Ubuntu 20)
-    # but we need to adhere to CMake 3.10 (Ubuntu 18).
-    # So instead, we invoke a new CMake project just to download pybind:
-    configure_file( CMake/pybind11-json-download.cmake.in
-                    ${CMAKE_BINARY_DIR}/external-projects/pybind11-json-download/CMakeLists.txt )
-    execute_process( COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-json-download"
-                     OUTPUT_QUIET
-                     RESULT_VARIABLE configure_ret )
-    execute_process( COMMAND "${CMAKE_COMMAND}" --build .
-                     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-json-download"
-                     OUTPUT_QUIET
-                     RESULT_VARIABLE build_ret )
+        # We want to clone the pybind repo and build it here, during configuration, so we can use it.
+        # But ExternalProject_add is limited in that it only does its magic during build.
+        # This is possible in CMake 3.12+ with FetchContent and FetchContent_MakeAvailable in 3.14+ (meaning Ubuntu 20)
+        # but we need to adhere to CMake 3.10 (Ubuntu 18).
+        # So instead, we invoke a new CMake project just to download pybind:
+        configure_file( CMake/pybind11-json-download.cmake.in
+                        ${CMAKE_BINARY_DIR}/external-projects/pybind11-json-download/CMakeLists.txt )
+        execute_process( COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+                         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-json-download"
+                         OUTPUT_QUIET
+                         RESULT_VARIABLE configure_ret )
+        execute_process( COMMAND "${CMAKE_COMMAND}" --build .
+                         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external-projects/pybind11-json-download"
+                         OUTPUT_QUIET
+                         RESULT_VARIABLE build_ret )
 
-    if( configure_ret OR build_ret )
-        message( FATAL_ERROR "Failed to download pybind11_json" )
+        if( configure_ret OR build_ret )
+            message( FATAL_ERROR "Failed to download pybind11_json" )
+        endif()
     endif()
 
     # pybind11_add_module will add the directory automatically (see below)

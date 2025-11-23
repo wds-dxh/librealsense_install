@@ -10,7 +10,14 @@ function(get_fastdds)
     mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
     mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
 
-    message(CHECK_START  "Fetching fastdds...")
+    # Check if the source directory already exists, if so, disable downloading
+    if(EXISTS "${CMAKE_BINARY_DIR}/third-party/fastdds")
+        set(FETCHCONTENT_FULLY_DISCONNECTED ON)
+        message(STATUS "FastDDS source directory exists, using existing source at ${CMAKE_BINARY_DIR}/third-party/fastdds")
+    else()
+        message(CHECK_START  "Fetching fastdds...")
+    endif()
+
     list(APPEND CMAKE_MESSAGE_INDENT "  ")  # Indent outputs
 
     FetchContent_Declare(
